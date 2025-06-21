@@ -155,6 +155,12 @@ export default function useIsBot(delay = 5000): UseAdvancedBotDetectionResult {
       // List of common search engine bot user agent patterns
       const crawlerPatterns: { pattern: RegExp; name: string }[] = [
         { pattern: /Googlebot/i, name: "Googlebot" },
+        { pattern: /Googlebot-Image/i, name: "Googlebot-Image" },
+        { pattern: /Googlebot-News/i, name: "Googlebot-News" },
+        { pattern: /Googlebot-Video/i, name: "Googlebot-Video" },
+        { pattern: /APIs-Google/i, name: "APIs-Google" },
+        { pattern: /AdsBot-Google/i, name: "AdsBot-Google" },
+        { pattern: /Mediapartners-Google/i, name: "Mediapartners-Google" },
         { pattern: /Bingbot/i, name: "Bingbot" },
         { pattern: /Slurp/i, name: "Yahoo! Slurp" },
         { pattern: /DuckDuckBot/i, name: "DuckDuckBot" },
@@ -165,8 +171,14 @@ export default function useIsBot(delay = 5000): UseAdvancedBotDetectionResult {
         { pattern: /facebot/i, name: "Facebook Bot" },
         { pattern: /ia_archiver/i, name: "Alexa Crawler" },
       ];
+
+      // Debug logging
+      console.log("Bot detection - User Agent:", currentData.userAgent);
+      console.log("Bot detection - Testing crawler patterns...");
+
       for (const { pattern, name } of crawlerPatterns) {
         if (pattern.test(currentData.userAgent)) {
+          console.log(`Bot detection - MATCHED: ${name}`);
           determinedAsBot = true;
           reasons.push(
             `User agent matches known search engine crawler: ${name}`
@@ -174,6 +186,18 @@ export default function useIsBot(delay = 5000): UseAdvancedBotDetectionResult {
           break;
         }
       }
+
+      // Fallback check for any Google-related patterns that might have been missed
+      if (!determinedAsBot && /Google/i.test(currentData.userAgent)) {
+        console.log("Bot detection - Fallback Google pattern matched");
+        determinedAsBot = true;
+        reasons.push(
+          "User agent contains Google-related pattern (fallback detection)"
+        );
+      }
+
+      console.log("Bot detection - Final result:", determinedAsBot);
+      console.log("Bot detection - Reasons:", reasons);
 
       // --- Strong Signals for Headless Browsers (like Playwright) & Automation ---
       if (currentData.webdriver) {

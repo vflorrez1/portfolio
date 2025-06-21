@@ -6,7 +6,7 @@ const App = () => {
   return isLikelyBot ? (
     <div>Are you a bot?</div>
   ) : (
-    <div>Vics new portfolio app 1</div>
+    <div>Vics new portfolio app 2</div>
   );
 };
 
