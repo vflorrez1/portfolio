@@ -151,6 +151,30 @@ export default function useIsBot(delay = 5000): UseAdvancedBotDetectionResult {
       const reasons: string[] = [];
       let determinedAsBot = false;
 
+      // --- Search Engine Crawler Detection (Googlebot, Bingbot, etc.) ---
+      // List of common search engine bot user agent patterns
+      const crawlerPatterns: { pattern: RegExp; name: string }[] = [
+        { pattern: /Googlebot/i, name: "Googlebot" },
+        { pattern: /Bingbot/i, name: "Bingbot" },
+        { pattern: /Slurp/i, name: "Yahoo! Slurp" },
+        { pattern: /DuckDuckBot/i, name: "DuckDuckBot" },
+        { pattern: /Baiduspider/i, name: "Baiduspider" },
+        { pattern: /YandexBot/i, name: "YandexBot" },
+        { pattern: /Sogou/i, name: "Sogou" },
+        { pattern: /Exabot/i, name: "Exabot" },
+        { pattern: /facebot/i, name: "Facebook Bot" },
+        { pattern: /ia_archiver/i, name: "Alexa Crawler" },
+      ];
+      for (const { pattern, name } of crawlerPatterns) {
+        if (pattern.test(currentData.userAgent)) {
+          determinedAsBot = true;
+          reasons.push(
+            `User agent matches known search engine crawler: ${name}`
+          );
+          break;
+        }
+      }
+
       // --- Strong Signals for Headless Browsers (like Playwright) & Automation ---
       if (currentData.webdriver) {
         determinedAsBot = true;
